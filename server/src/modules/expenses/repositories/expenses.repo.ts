@@ -39,7 +39,12 @@ export const expensesRepo = {
       to?: string;
       category?: string;
       title?: string;
+      minAmount?: number;
+      maxAmount?: number;
+      sortBy?: "date" | "amount" | "category";
+      sortOrder?: "asc" | "desc";
       limit?: number;
+      offset?: number;
     }
   ) {
     const where: string[] = ["user_id = $1"];
@@ -66,16 +71,39 @@ export const expensesRepo = {
       values.push(`%${q.title}%`);
     }
 
+    if (q.minAmount !== undefined) {
+      where.push(`expense_amount_cents >= $${i++}`);
+      values.push(q.minAmount);
+    }
+
+    if (q.maxAmount !== undefined) {
+      where.push(`expense_amount_cents <= $${i++}`);
+      values.push(q.maxAmount);
+    }
+
+    // Build ORDER BY clause
+    let orderByClause = "expense_date DESC, created_at DESC";
+    if (q.sortBy === "amount") {
+      orderByClause = `expense_amount_cents ${q.sortOrder === "asc" ? "ASC" : "DESC"}, created_at DESC`;
+    } else if (q.sortBy === "category") {
+      orderByClause = `expense_category ${q.sortOrder === "asc" ? "ASC" : "DESC"}, expense_date DESC`;
+    } else if (q.sortBy === "date") {
+      orderByClause = `expense_date ${q.sortOrder === "asc" ? "ASC" : "DESC"}, created_at DESC`;
+    }
+
     const limit = q.limit ?? 50;
+    const offset = q.offset ?? 0;
     values.push(limit);
+    values.push(offset);
 
     const { rows } = await pool.query(
       `
       SELECT *
       FROM expenses
       WHERE ${where.join(" AND ")}
-      ORDER BY expense_date DESC, created_at DESC
-      LIMIT $${i}
+      ORDER BY ${orderByClause}
+      LIMIT $${i++}
+      OFFSET $${i++}
       `,
       values
     );
