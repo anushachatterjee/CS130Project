@@ -33,7 +33,12 @@ export const ListExpensesQuerySchema = z.object({
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   category: ExpenseCategory.optional(),
   title: z.string().min(1).max(200).optional(),
+  minAmount: z.coerce.number().int().min(0).optional(),
+  maxAmount: z.coerce.number().int().optional(),
+  sortBy: z.enum(["date", "amount", "category"]).default("date"),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
   limit: z.coerce.number().int().min(1).max(200).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
 });
 
 export type CreateExpenseDTO = z.infer<typeof CreateExpenseSchema>;
