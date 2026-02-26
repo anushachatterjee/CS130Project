@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CATEGORY_COLORS, STATUS_COLORS } from '../../constants/colors';
+import { apiFetch } from '../../api';
 import './SubscriptionsPage.css';
 
 interface Subscription {
@@ -23,7 +24,6 @@ interface SubscriptionFormData {
   subscription_note: string;
 }
 
-const API_BASE_URL = 'http://localhost:4000/api';
 
 export default function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -52,7 +52,7 @@ export default function SubscriptionsPage() {
   const fetchSubscriptions = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/subscriptions`);
+      const response = await apiFetch('/subscriptions');
       if (!response.ok) throw new Error('Failed to fetch subscriptions');
       const data = await response.json();
       setSubscriptions(data);
@@ -111,7 +111,7 @@ export default function SubscriptionsPage() {
     if (!deletingSubscriptionId) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/subscriptions/${deletingSubscriptionId}`, {
+      const response = await apiFetch(`/subscriptions/${deletingSubscriptionId}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete subscription');
@@ -169,12 +169,12 @@ export default function SubscriptionsPage() {
       };
 
       const url = editingSubscription
-        ? `${API_BASE_URL}/subscriptions/${editingSubscription.subscription_id}`
-        : `${API_BASE_URL}/subscriptions`;
+        ? `/subscriptions/${editingSubscription.subscription_id}`
+        : `/subscriptions`;
 
       const method = editingSubscription ? 'PUT' : 'POST';
 
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',

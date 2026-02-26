@@ -1,17 +1,10 @@
 import type { Response, NextFunction } from "express";
 import type * as express from "express";
+import jwt from "jsonwebtoken";
 
-/**
- * TEMPORARY PLACEHOLDER AUTH
- * This middleware is ONLY for developing the Expenses module.
- * It injects a hardcoded test userId so expense APIs can be built independently.
- *
- * TODO (Auth owner):
- * - Replace this entire file with real JWT verification
- * - Set req.userId from decoded token (payload.sub)
- *
- * This file should NOT be used in production.
- */
+function getJwtSecret() {
+  return process.env.JWT_SECRET || "dev-secret-change-in-production";
+}
 
 export interface AuthRequest extends express.Request {
   userId: string;
@@ -19,12 +12,22 @@ export interface AuthRequest extends express.Request {
 
 export function requireAuth(
   req: express.Request,
-  _res: Response,
+  res: Response,
   next: NextFunction
 ) {
-  (req as AuthRequest).userId = "00000000-0000-0000-0000-000000000000";
-  next();
+  const header = req.headers.authorization;
+  if (!header?.startsWith("Bearer ")) {
+    res.status(401).json({ error: "Missing or invalid authorization header" });
+    return;
+  }
+
+  const token = header.slice(7);
+
+  try {
+    const payload = jwt.verify(token, getJwtSecret()) as { sub: string };
+    (req as AuthRequest).userId = payload.sub;
+    next();
+  } catch {
+    res.status(401).json({ error: "Invalid or expired token" });
+  }
 }
-/**
- * END
- */
