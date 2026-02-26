@@ -26,28 +26,88 @@
   margin-bottom: 3rem;
 }
 
-.login-placeholder {
-  background: white;
+.login-card {
+  background: #0f3460;
   border-radius: 12px;
-  padding: 3rem 2rem;
+  padding: 2rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.login-placeholder > p:first-child {
-  font-size: 1.25rem;
+.auth-tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  color: #a0a0a0;
+  font-size: 1rem;
   font-weight: 600;
-  color: #1a1a2e;
-  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.note {
+.auth-tab.active {
+  background: #4ecca3;
+  color: white;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  color: #e0e0e0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #e0e0e0;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-group input::placeholder {
   color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 2rem;
 }
 
-.temp-login-btn {
-  padding: 0.875rem 2rem;
+.form-group input:focus {
+  outline: none;
+  border-color: #4ecca3;
+}
+
+.auth-error {
+  color: #ff6b6b;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 0.5rem;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 6px;
+}
+
+.auth-submit {
+  padding: 0.875rem;
   background-color: #4ecca3;
   color: white;
   border: none;
@@ -58,12 +118,36 @@
   transition: all 0.2s ease;
 }
 
-.temp-login-btn:hover {
+.auth-submit:hover:not(:disabled) {
   background-color: #3dbb8d;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(78, 204, 163, 0.4);
 }
 
-.temp-login-btn:active {
+.auth-submit:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  margin-top: 1.5rem;
+  color: #a0a0a0;
+  font-size: 0.875rem;
+}
+
+.auth-switch-btn {
+  background: none;
+  border: none;
+  color: #4ecca3;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.auth-switch-btn:hover {
+  text-decoration: underline;
 }

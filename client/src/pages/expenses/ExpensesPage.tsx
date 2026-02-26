@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CATEGORY_COLORS } from "../../constants/colors";
+import { apiFetch } from '../../api';
 import './ExpensesPage.css'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
 
 interface Expense {
   expense_id: string;
@@ -23,9 +22,35 @@ interface ExpenseFormData {
   note: string;
 }
 
+interface FilterState {
+  search: string;
+  category: string;
+  minAmount: string;
+  maxAmount: string;
+  dateFrom: string;
+  dateTo: string;
+  sortBy: "date" | "amount" | "category";
+  sortOrder: "asc" | "desc";
+  page: number;
+}
+
+interface PendingFilterState {
+  search: string;
+  category: string;
+  minAmount: string;
+  maxAmount: string;
+  dateFrom: string;
+  dateTo: string;
+  sortBy: "date" | "amount" | "category";
+  sortOrder: "asc" | "desc";
+}
+
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [, setIsRefreshing] = useState(false);
+  const hasLoadedOnceRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
 
   const [showModal, setShowModal] = useState(false);
@@ -44,17 +69,102 @@ export default function ExpensesPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deletingTitle, setDeletingTitle] = useState('');
 
-  const fetchExpenses = async () => {
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    category: '',
+    minAmount: '',
+    maxAmount: '',
+    dateFrom: '',
+    dateTo: '',
+    sortBy: 'date',
+    sortOrder: 'desc',
+    page: 0,
+  });
+
+  const [pendingFilters, setPendingFilters] = useState<PendingFilterState>({
+    search: '',
+    category: '',
+    minAmount: '',
+    maxAmount: '',
+    dateFrom: '',
+    dateTo: '',
+    sortBy: 'date',
+    sortOrder: 'desc',
+  });
+
+  const itemsPerPage = 10;
+
+  const parseAmountToCents = (amount: string): number | null => {
+    const trimmed = amount.trim();
+    if (!trimmed) return null;
+
+    const validMoney = /^(\d+(\.\d{0,2})?|\.\d{1,2})$/.test(trimmed);
+    if (!validMoney) return null;
+
+    const value = Number(trimmed);
+    if (Number.isNaN(value) || value < 0) return null;
+    return Math.round(value * 100);
+  };
+
+  const getDatePreset = (presetType: string): { from: string; to: string } => {
+    const today = new Date();
+    let from = '', to = todayIso;
+
+    switch (presetType) {
+      case 'thisMonth':
+        from = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+        break;
+      case 'last30Days':
+        const date30 = new Date(today);
+        date30.setDate(date30.getDate() - 30);
+        from = date30.toISOString().split('T')[0];
+        break;
+      case 'thisYear':
+        from = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
+        break;
+      case 'allTime':
+        from = '';
+        to = '';
+        break;
+    }
+
+    return { from, to };
+  };
+
+  const fetchExpenses = async (filterState: FilterState) => {
     try {
-      setLoading(true);
-      const resp = await fetch(`${API_BASE_URL}/expenses`);
+      const isFirstLoad = !hasLoadedOnceRef.current;
+      if (isFirstLoad) {
+        setIsInitialLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
+      const params = new URLSearchParams();
+
+      if (filterState.search) params.append('title', filterState.search);
+      if (filterState.category) params.append('category', filterState.category);
+      const minAmountCents = parseAmountToCents(filterState.minAmount);
+      const maxAmountCents = parseAmountToCents(filterState.maxAmount);
+      if (minAmountCents !== null) params.append('minAmount', minAmountCents.toString());
+      if (maxAmountCents !== null) params.append('maxAmount', maxAmountCents.toString());
+      if (filterState.dateFrom) params.append('from', filterState.dateFrom);
+      if (filterState.dateTo) params.append('to', filterState.dateTo);
+      params.append('sortBy', filterState.sortBy);
+      params.append('sortOrder', filterState.sortOrder);
+      params.append('limit', itemsPerPage.toString());
+      params.append('offset', (filterState.page * itemsPerPage).toString());
+
+      const resp = await apiFetch(`/expenses?${params.toString()}`);
       if (!resp.ok) throw Error('Failed to load expenses');
       const data: Expense[] = await resp.json();
       setExpenses(data);
+      setTotalCount(data.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
-      setLoading(false);
+      hasLoadedOnceRef.current = true;
+      setIsInitialLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -89,14 +199,14 @@ export default function ExpensesPage() {
     if (!deletingId) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/expenses/${deletingId}`, {
+      const response = await apiFetch(`/expenses/${deletingId}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete expense');
       setShowDeleteConfirm(false);
       setDeletingId(null);
       setDeletingTitle('');
-      await fetchExpenses();
+      await fetchExpenses(filters);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete expense');
       console.error('Error deleting expense:', err);
@@ -137,14 +247,14 @@ export default function ExpensesPage() {
       };
 
       const url = editingExpense
-        ? `${API_BASE_URL}/expenses/${editingExpense.expense_id}`
-        : `${API_BASE_URL}/expenses`;
+        ? `/expenses/${editingExpense.expense_id}`
+        : `/expenses`;
       // server expects PATCH for updates
       const method = editingExpense ? 'PATCH' : 'POST';
 
       console.log('[client] submitting', { method, url, payload });
 
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -159,7 +269,7 @@ export default function ExpensesPage() {
       }
 
       setShowModal(false);
-      await fetchExpenses();
+      await fetchExpenses(filters);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to save expense');
       console.error('Error saving expense:', err);
@@ -184,7 +294,21 @@ export default function ExpensesPage() {
     return new Date(dateString).toISOString().split('T')[0];
   };
 
-  useEffect(() => {fetchExpenses();}, []);
+  const handleInstantFilterChange = (changes: Partial<PendingFilterState>) => {
+    const newPending = { ...pendingFilters, ...changes };
+    setPendingFilters(newPending);
+    setFilters({ ...newPending, search: filters.search, page: 0 }); // keep search from instant update
+  };
+
+  const handleApplySearch = () => {
+    setFilters({ ...filters, search: pendingFilters.search, page: 0 });
+  };
+
+  useEffect(() => {
+    fetchExpenses(filters);
+  }, [filters]);
+
+  const [showFilters, setShowFilters] = useState(false);
 
   return (
     <div className="expenses-page">
@@ -201,66 +325,174 @@ export default function ExpensesPage() {
         </div>
       )}
 
-      {loading ? (
+      {isInitialLoading ? (
         <div className="loading">Loading expenses...</div>
       ) : (
-        <div className="table-container">
-          <table className="expenses-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Amount</th>
-                <th>Note</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {expenses.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="empty-state">
-                    No expenses yet. Click &quot;Add Expense&quot; to get started.
-                  </td>
+        <div style={{ marginTop: '2rem' }}>
+          <button style={{ padding: '0.5rem 1rem', cursor: 'pointer', marginBottom: '1rem' }} onClick={handleAddClick}>
+            + Add Expense
+          </button>
+          <button className="toggle-filters-btn" onClick={() => setShowFilters(v => !v)}>
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </button>
+          {showFilters && (
+            <div className="filters-panel">
+              {/* Search Section */}
+              <div className="search-section">
+                <label>Search by Title</label>
+                <div className="search-row">
+                  <input
+                    type="text"
+                    placeholder="Search expenses..."
+                    value={pendingFilters.search}
+                    onChange={e => setPendingFilters({ ...pendingFilters, search: e.target.value })}
+                    className="filter-input"
+                  />
+                  <button className="apply-search-btn" onClick={handleApplySearch}>Apply Search</button>
+                </div>
+              </div>
+
+              {/* Instant Filters Section */}
+              <div className="instant-filters">
+                {/* Date Range Row */}
+                <div className="filter-row">
+                  <div className="filter-row-title">Date Range</div>
+                  <div className="date-presets">
+                    <button className={`preset-btn ${pendingFilters.dateFrom === '' && pendingFilters.dateTo === '' ? 'active' : ''}`} onClick={() => handleInstantFilterChange({ dateFrom: '', dateTo: '' })}>All Time</button>
+                    <button className={`preset-btn ${pendingFilters.dateFrom === getDatePreset('thisMonth').from ? 'active' : ''}`} onClick={() => { const { from, to } = getDatePreset('thisMonth'); handleInstantFilterChange({ dateFrom: from, dateTo: to }); }}>This Month</button>
+                    <button className={`preset-btn ${pendingFilters.dateFrom === getDatePreset('last30Days').from ? 'active' : ''}`} onClick={() => { const { from, to } = getDatePreset('last30Days'); handleInstantFilterChange({ dateFrom: from, dateTo: to }); }}>Last 30 Days</button>
+                    <button className={`preset-btn ${pendingFilters.dateFrom === getDatePreset('thisYear').from ? 'active' : ''}`} onClick={() => { const { from, to } = getDatePreset('thisYear'); handleInstantFilterChange({ dateFrom: from, dateTo: to }); }}>This Year</button>
+                  </div>
+                  <div className="custom-date-range">
+                    <input type="date" value={pendingFilters.dateFrom} onChange={e => handleInstantFilterChange({ dateFrom: e.target.value })} className="filter-input" placeholder="From" title="From date" />
+                    <span>to</span>
+                    <input type="date" value={pendingFilters.dateTo} onChange={e => handleInstantFilterChange({ dateTo: e.target.value })} className="filter-input" placeholder="To" title="To date" />
+                  </div>
+                </div>
+
+                {/* Filters Row */}
+                <div className="filter-row">
+                  <div className="filter-row-title">Filters</div>
+                  <div className="filter-control">
+                    <label className="filter-control-label">Category</label>
+                    <select value={pendingFilters.category} onChange={e => handleInstantFilterChange({ category: e.target.value })} className="filter-input filter-select-sm">
+                      <option value="">All</option>
+                      <option value="Food">Food</option>
+                      <option value="Housing">Housing</option>
+                      <option value="Transportation">Transport</option>
+                      <option value="Utilities">Utilities</option>
+                      <option value="Entertainment">Entertainment</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div className="filter-control">
+                    <label className="filter-control-label">Amount</label>
+                    <div className="amount-range-inputs">
+                      <input type="number" placeholder="Min" min="0" step="0.01" value={pendingFilters.minAmount} onChange={e => handleInstantFilterChange({ minAmount: e.target.value })} className="filter-input" title="Minimum amount" />
+                      <span>–</span>
+                      <input type="number" placeholder="Max" min="0" step="0.01" value={pendingFilters.maxAmount} onChange={e => handleInstantFilterChange({ maxAmount: e.target.value })} className="filter-input" title="Maximum amount" />
+                    </div>
+                  </div>
+                  <div className="filter-control">
+                    <label className="filter-control-label">Sort</label>
+                    <div className="sort-controls">
+                      <select value={pendingFilters.sortBy} onChange={e => handleInstantFilterChange({ sortBy: e.target.value as any })} className="filter-input">
+                        <option value="date">Date</option>
+                        <option value="amount">Amount</option>
+                        <option value="category">Category</option>
+                      </select>
+                      <button className={`sort-order-btn ${pendingFilters.sortOrder === 'asc' ? 'active' : ''}`} onClick={() => handleInstantFilterChange({ sortOrder: pendingFilters.sortOrder === 'desc' ? 'asc' : 'desc' })} title={pendingFilters.sortOrder === 'asc' ? 'Ascending' : 'Descending'}>{pendingFilters.sortOrder === 'asc' ? '↑' : '↓'}</button>
+                    </div>
+                  </div>
+                  <button className="reset-all-btn" onClick={() => { setPendingFilters({ search: '', category: '', minAmount: '', maxAmount: '', dateFrom: '', dateTo: '', sortBy: 'date', sortOrder: 'desc' }); setFilters({ search: '', category: '', minAmount: '', maxAmount: '', dateFrom: '', dateTo: '', sortBy: 'date', sortOrder: 'desc', page: 0 }); }} title="Reset all filters">Reset All</button>
+                </div>
+              </div>
+            </div>
+          )}
+          <div style={{ padding: '1rem', backgroundColor: 'white', borderRadius: '8px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #ddd' }}>
+                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Date</th>
+                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Title</th>
+                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Category</th>
+                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Amount</th>
+                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Note</th>
+                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Actions</th>
                 </tr>
-              ) : (
-                expenses.map((expense) => (
-                  <tr key={expense.expense_id}>
-                    <td>{formatDate(expense.expense_date)}</td>
-                    <td>{expense.expense_title}</td>
-                    <td>
-                      <span
-                        className="category-badge"
-                        style={{
-                          backgroundColor: CATEGORY_COLORS[expense.expense_category] || '#95a5a6',
-                          color: '#ffffff',
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: '9999px',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          display: 'inline-block',
-                        }}
-                      >
-                        {expense.expense_category}
-                      </span>
-                    </td>
-                    <td>${(expense.expense_amount_cents / 100).toFixed(2)}</td>
-                    <td>{expense.expense_note}</td>
-                    <td>
-                      <div className="action-buttons">
-                        <button className="btn-edit" onClick={() => handleEditClick(expense)}>
-                          Edit
-                        </button>
-                        <button className="btn-delete" onClick={() => handleDeleteClick(expense)}>
-                          Delete
-                        </button>
-                      </div>
+              </thead>
+              <tbody>
+                {expenses.length == 0 ? (
+                  <tr>
+                    <td colSpan={4} style={{ padding: '1rem', textAlign: 'center', color: '#999' }}>
+                      No expenses found. Try adjusting your filters or click "Add Expense" to create one.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  expenses.map((expense) => (
+                    <tr key={expense.expense_id}>
+                      <td>{formatDate(expense.expense_date)}</td>
+                      <td>{expense.expense_title}</td>
+                      <td>
+                        <span
+                          className="category-badge"
+                          style={{
+                            backgroundColor: CATEGORY_COLORS[expense.expense_category] || '#95a5a6',
+                            color: '#ffffff',
+                            padding: '0.25rem 0.75rem',
+                            borderRadius: '9999px',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            display: 'inline-block'
+                          }}
+                        >
+                          {expense.expense_category}
+                        </span>
+                      </td>
+                      <td>${(expense.expense_amount_cents / 100).toFixed(2)}</td>
+                      <td>{expense.expense_note}</td>
+                      <td>
+                        <div className="action-buttons">
+                          <button
+                            className="btn-edit"
+                            onClick={() => handleEditClick(expense)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="btn-delete"
+                            onClick={() => handleDeleteClick(expense)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                )))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="pagination-controls">
+            <button
+              disabled={filters.page === 0}
+              onClick={() => setFilters({ ...filters, page: filters.page - 1 })}
+              className="pagination-btn"
+            >
+              ← Previous
+            </button>
+            <span className="pagination-info">
+              Page {filters.page + 1} | Showing {expenses.length} of {totalCount}
+            </span>
+            <button
+              disabled={expenses.length < itemsPerPage}
+              onClick={() => setFilters({ ...filters, page: filters.page + 1 })}
+              className="pagination-btn"
+            >
+              Next →
+            </button>
+          </div>
         </div>
       )}
 
