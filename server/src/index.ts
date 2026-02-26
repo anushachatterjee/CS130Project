@@ -5,6 +5,7 @@ import { dashboardRouter } from "./modules/dashboard/dashboard.routes";
 import { subscriptionsRouter } from "./modules/subscriptions/subscriptions.routes";
 import { expensesRouter } from "./modules/expenses/expenses.routes";
 import { authRouter } from "./modules/auth/auth.routes";
+import { aiRouter } from "./modules/ai/ai.routes";
 
 dotenv.config();
 
