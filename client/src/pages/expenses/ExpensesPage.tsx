@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CATEGORY_COLORS } from "../../constants/colors";
+import { apiFetch } from '../../api';
 import './ExpensesPage.css'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
 
 interface Expense {
   expense_id: string;
@@ -155,7 +154,7 @@ export default function ExpensesPage() {
       params.append('limit', itemsPerPage.toString());
       params.append('offset', (filterState.page * itemsPerPage).toString());
 
-      const resp = await fetch(`${API_BASE_URL}/expenses?${params.toString()}`);
+      const resp = await apiFetch(`/expenses?${params.toString()}`);
       if (!resp.ok) throw Error('Failed to load expenses');
       const data: Expense[] = await resp.json();
       setExpenses(data);
@@ -200,7 +199,7 @@ export default function ExpensesPage() {
     if (!deletingId) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/expenses/${deletingId}`, {
+      const response = await apiFetch(`/expenses/${deletingId}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete expense');
@@ -248,14 +247,14 @@ export default function ExpensesPage() {
       };
 
       const url = editingExpense
-        ? `${API_BASE_URL}/expenses/${editingExpense.expense_id}`
-        : `${API_BASE_URL}/expenses`;
+        ? `/expenses/${editingExpense.expense_id}`
+        : `/expenses`;
       // server expects PATCH for updates
       const method = editingExpense ? 'PATCH' : 'POST';
 
       console.log('[client] submitting', { method, url, payload });
 
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
