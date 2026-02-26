@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { dashboardRouter } from "./modules/dashboard/dashboard.routes";
 import { subscriptionsRouter } from "./modules/subscriptions/subscriptions.routes";
 import { expensesRouter } from "./modules/expenses/expenses.routes";
+import { authRouter } from "./modules/auth/auth.routes";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
 // Mount module routers
+app.use("/api/auth", authRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/subscriptions", subscriptionsRouter);
 app.use("/api/expenses", expensesRouter);

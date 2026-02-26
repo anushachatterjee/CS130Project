@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import './MainLayout.css';
 
 export default function MainLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Get username from localStorage or use default mock user
   const username = localStorage.getItem('username') || 'testuser';
@@ -27,6 +28,13 @@ export default function MainLayout() {
 
   const handleClearAvatar = () => {
     setTempAvatarUrl('');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('avatarUrl');
+    navigate('/login');
   };
 
   const navItems = [
@@ -67,6 +75,9 @@ export default function MainLayout() {
               )}
             </div>
             <div className="username">{username}</div>
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
 
           {/* Avatar Modal */}

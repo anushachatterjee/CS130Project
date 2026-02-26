@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { CATEGORY_COLORS, STATUS_COLORS } from '../../constants/colors';
+import { apiFetch } from '../../api';
 import './DashboardPage.css';
 
 interface CategorySpending {
@@ -45,7 +46,7 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:4000/api/dashboard/summary');
+      const response = await apiFetch('/dashboard/summary');
       if (!response.ok) {
         throw new Error('Failed to fetch dashboard data');
       }
