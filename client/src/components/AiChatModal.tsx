@@ -11,7 +11,7 @@ type Props = {
 type ResizeDirection = 'right' | 'bottom' | 'left' | 'top';
 
 export default function AiChatModal({ open, onClose }: Props) {
-  const [size, setSize] = useState({ width: 520, height: 360 });
+  const [size, setSize] = useState({ width: 680, height: 680 });
   const [top, setTop] = useState(72);
 
   useEffect(() => {
