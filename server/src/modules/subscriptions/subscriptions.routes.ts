@@ -5,7 +5,6 @@ import { subscriptionsController } from "./subscriptions.controller";
 
 export const subscriptionsRouter = Router();
 
-// TODO(Auth): replace placeholder requireAuth with real auth middleware
 subscriptionsRouter.use(requireAuth);
 
 subscriptionsRouter.get("/", asyncHandler(subscriptionsController.list));
