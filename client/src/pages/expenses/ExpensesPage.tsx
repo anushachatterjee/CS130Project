@@ -92,7 +92,7 @@ export default function ExpensesPage() {
     sortOrder: 'desc',
   });
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const parseAmountToCents = (amount: string): number | null => {
     const trimmed = amount.trim();
