@@ -29,8 +29,64 @@
   padding: 0.65rem 0.75rem;
   border-radius: 12px;
   font-size: 1.1rem;
-  line-height: 1.35;
-  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+/* Markdown rendered inside assistant bubbles */
+.ai-chat-bubble-assistant p {
+  margin: 0 0 0.5rem 0;
+}
+.ai-chat-bubble-assistant p:last-child {
+  margin-bottom: 0;
+}
+.ai-chat-bubble-assistant h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0.85rem 0 0.3rem 0;
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  padding-bottom: 0.2rem;
+}
+.ai-chat-bubble-assistant h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0.65rem 0 0.2rem 0;
+  color: rgba(255,255,255,0.9);
+}
+.ai-chat-bubble-assistant ul,
+.ai-chat-bubble-assistant ol {
+  margin: 0.25rem 0 0.5rem 0;
+  padding-left: 1.25rem;
+}
+.ai-chat-bubble-assistant li {
+  margin-bottom: 0.2rem;
+}
+.ai-chat-bubble-assistant strong {
+  font-weight: 700;
+  color: #ffffff;
+}
+.ai-chat-bubble-assistant em {
+  font-style: italic;
+  color: rgba(255,255,255,0.85);
+}
+.ai-chat-bubble-assistant code {
+  font-family: monospace;
+  font-size: 0.9em;
+  background: rgba(255,255,255,0.12);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.ai-chat-bubble-assistant blockquote {
+  border-left: 3px solid rgba(255,255,255,0.4);
+  margin: 0.4rem 0;
+  padding: 0.3rem 0.75rem;
+  color: rgba(255,255,255,0.75);
+  font-style: italic;
+}
+.ai-chat-bubble-assistant hr {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  margin: 0.6rem 0;
 }
 
 .ai-chat-bubble-user {
@@ -52,6 +108,35 @@
   padding: 0.25rem 0.5rem;
 }
 
+.ai-chat-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0 0.1rem;
+}
+
+.ai-chat-quick-btn {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(245, 247, 251, 0.85);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.ai-chat-quick-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+.ai-chat-quick-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .ai-chat-input-row {
   display: flex;
   align-items: center;
@@ -71,6 +156,11 @@
 
 .ai-chat-input-row input::placeholder {
   color: rgba(245, 247, 251, 0.7);
+}
+
+.ai-chat-input-row input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .ai-chat-input-row input:focus,
