@@ -137,4 +137,38 @@ export const subscriptionsRepo = {
     );
     return result.rows.length > 0;
   },
+
+  async findDueRenewals(): Promise<SubscriptionRow[]> {
+    const result = await pool.query<SubscriptionRow>(
+      `SELECT
+        subscription_id,
+        user_id,
+        subscription_title,
+        subscription_category,
+        subscription_amount_cents,
+        billing_cycle,
+        next_renewal_date,
+        subscription_status,
+        subscription_note,
+        created_at
+      FROM subscriptions
+      WHERE subscription_status IN ('active', 'trial')
+        AND billing_cycle != 'none'
+        AND next_renewal_date <= CURRENT_DATE
+      ORDER BY next_renewal_date ASC`
+    );
+    return result.rows;
+  },
+
+  async updateRenewalDate(
+    subscriptionId: string,
+    newRenewalDate: Date
+  ): Promise<void> {
+    await pool.query(
+      `UPDATE subscriptions
+      SET next_renewal_date = $1
+      WHERE subscription_id = $2`,
+      [newRenewalDate.toISOString().split('T')[0], subscriptionId]
+    );
+  },
 };
