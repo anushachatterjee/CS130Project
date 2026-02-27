@@ -5,7 +5,6 @@ import { expensesController } from "./expenses.controller";
 
 export const expensesRouter = Router();
 
-// TODO(Auth): replace placeholder requireAuth with real auth middleware
 expensesRouter.use(requireAuth);
 
 expensesRouter.post("/", asyncHandler(expensesController.create));
