@@ -6,6 +6,7 @@ import { subscriptionsRouter } from "./modules/subscriptions/subscriptions.route
 import { expensesRouter } from "./modules/expenses/expenses.routes";
 import { authRouter } from "./modules/auth/auth.routes";
 import { aiRouter } from "./modules/ai/ai.routes";
+import { scheduler } from "./lib/scheduler";
 
 dotenv.config();
 
@@ -24,4 +25,19 @@ app.use("/api/ai", aiRouter);
 
 
 const port = Number(process.env.PORT ?? 4000);
-app.listen(port, () => console.log(`API http://localhost:${port}`));
+const server = app.listen(port, () => {
+  console.log(`API http://localhost:${port}`);
+
+  // Start scheduled jobs
+  scheduler.start();
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received: closing HTTP server');
+  scheduler.stop();
+  server.close(() => {
+    console.log('HTTP server closed');
+    process.exit(0);
+  });
+});
