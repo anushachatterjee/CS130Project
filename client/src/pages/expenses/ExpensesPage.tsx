@@ -332,10 +332,7 @@ export default function ExpensesPage() {
       {isInitialLoading ? (
         <div className="loading">Loading expenses...</div>
       ) : (
-        <div style={{ marginTop: '2rem' }}>
-          <button style={{ padding: '0.5rem 1rem', cursor: 'pointer', marginBottom: '1rem' }} onClick={handleAddClick}>
-            + Add Expense
-          </button>
+        <div className="expenses-content">
           <button className="toggle-filters-btn" onClick={() => setShowFilters(v => !v)}>
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
@@ -413,22 +410,22 @@ export default function ExpensesPage() {
               </div>
             </div>
           )}
-          <div style={{ padding: '1rem', backgroundColor: 'white', borderRadius: '8px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="table-container">
+            <table className="expenses-table">
               <thead>
-                <tr style={{ borderBottom: '2px solid #ddd' }}>
-                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Date</th>
-                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Title</th>
-                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Category</th>
-                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Amount</th>
-                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Note</th>
-                  <th style={{ padding: '0.5rem', textAlign: 'left' }}>Actions</th>
+                <tr>
+                  <th>Date</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Note</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {expenses.length == 0 ? (
+                {expenses.length === 0 ? (
                   <tr>
-                    <td colSpan={4} style={{ padding: '1rem', textAlign: 'center', color: '#999' }}>
+                    <td colSpan={6} className="empty-state">
                       No expenses found. Try adjusting your filters or click "Add Expense" to create one.
                     </td>
                   </tr>
@@ -436,25 +433,19 @@ export default function ExpensesPage() {
                   expenses.map((expense) => (
                     <tr key={expense.expense_id}>
                       <td>{formatDate(expense.expense_date)}</td>
-                      <td>{expense.expense_title}</td>
+                      <td className="expense-title-cell">{expense.expense_title}</td>
                       <td>
                         <span
                           className="category-badge"
                           style={{
                             backgroundColor: CATEGORY_COLORS[expense.expense_category] || '#95a5a6',
-                            color: '#ffffff',
-                            padding: '0.25rem 0.75rem',
-                            borderRadius: '9999px',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            display: 'inline-block'
                           }}
                         >
                           {expense.expense_category}
                         </span>
                       </td>
-                      <td>${(expense.expense_amount_cents / 100).toFixed(2)}</td>
-                      <td>{expense.expense_note}</td>
+                      <td className="expense-amount-cell">${(expense.expense_amount_cents / 100).toFixed(2)}</td>
+                      <td className="expense-note-cell">{expense.expense_note || '—'}</td>
                       <td>
                         <div className="action-buttons">
                           <button

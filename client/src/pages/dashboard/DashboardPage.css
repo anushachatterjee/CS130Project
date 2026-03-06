@@ -1,14 +1,14 @@
 .dashboard-page {
-  padding: 2rem;
+  padding: 1.5rem 2rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 .dashboard-page h1 {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #0f9b72;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .loading,
@@ -25,12 +25,12 @@
 
 /* Summary Card */
 .summary-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #0f9b72 0%, #0d8563 100%);
+  border-radius: 14px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
   color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(15, 155, 114, 0.2);
 }
 
 .summary-header {
@@ -41,9 +41,10 @@
 }
 
 .summary-header h2 {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 500;
   margin: 0;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .month-label {
@@ -55,7 +56,7 @@
 }
 
 .total-amount {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -77,10 +78,10 @@
 /* Card Styles */
 .card {
   background: white;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8eeec;
 }
 
 .card h3 {
