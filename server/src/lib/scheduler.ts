@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import { runRenewalJob } from '../modules/subscriptions/jobs/renewal.job';
 
 export class Scheduler {
-  private tasks: cron.ScheduledTask[] = [];
+  private tasks: ReturnType<typeof cron.schedule>[] = [];
 
   /**
    * Initialize all scheduled jobs
@@ -18,7 +18,6 @@ export class Scheduler {
         await runRenewalJob();
       },
       {
-        scheduled: true,
         timezone: process.env.SCHEDULER_TIMEZONE || 'America/Los_Angeles',
       }
     );

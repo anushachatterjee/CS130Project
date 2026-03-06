@@ -73,6 +73,11 @@ export const subscriptionsController = {
       subscription_note,
     } = req.body;
 
+    // Ensure id is a string
+    if (typeof id !== 'string') {
+      return res.status(400).json({ error: "Invalid subscription ID" });
+    }
+
     // Convert dollars to cents
     const amount_cents = Math.round(subscription_amount * 100);
 
@@ -101,6 +106,12 @@ export const subscriptionsController = {
 
   async remove(req: AuthRequest, res: Response) {
     const { id } = req.params;
+
+    // Ensure id is a string
+    if (typeof id !== 'string') {
+      return res.status(400).json({ error: "Invalid subscription ID" });
+    }
+
     const deleted = await subscriptionsRepo.delete(id);
 
     if (!deleted) {

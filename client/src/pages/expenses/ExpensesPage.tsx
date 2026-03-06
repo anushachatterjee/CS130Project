@@ -111,21 +111,25 @@ export default function ExpensesPage() {
     let from = '', to = todayIso;
 
     switch (presetType) {
-      case 'thisMonth':
+      case 'thisMonth': {
         from = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
         break;
-      case 'last30Days':
+      }
+      case 'last30Days': {
         const date30 = new Date(today);
         date30.setDate(date30.getDate() - 30);
         from = date30.toISOString().split('T')[0];
         break;
-      case 'thisYear':
+      }
+      case 'thisYear': {
         from = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
         break;
-      case 'allTime':
+      }
+      case 'allTime': {
         from = '';
         to = '';
         break;
+      }
     }
 
     return { from, to };
@@ -306,7 +310,7 @@ export default function ExpensesPage() {
 
   useEffect(() => {
     fetchExpenses(filters);
-  }, [filters]);
+  }, [filters, fetchExpenses]);
 
   const [showFilters, setShowFilters] = useState(false);
 
@@ -396,7 +400,7 @@ export default function ExpensesPage() {
                   <div className="filter-control">
                     <label className="filter-control-label">Sort</label>
                     <div className="sort-controls">
-                      <select value={pendingFilters.sortBy} onChange={e => handleInstantFilterChange({ sortBy: e.target.value as any })} className="filter-input">
+                      <select value={pendingFilters.sortBy} onChange={e => handleInstantFilterChange({ sortBy: e.target.value as 'date' | 'amount' | 'category' })} className="filter-input">
                         <option value="date">Date</option>
                         <option value="amount">Amount</option>
                         <option value="category">Category</option>
