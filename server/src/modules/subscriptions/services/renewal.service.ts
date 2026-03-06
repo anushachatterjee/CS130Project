@@ -1,4 +1,5 @@
 import { subscriptionsRepo, type SubscriptionRow } from '../repositories/subscriptions.repo';
+import { expensesRepo } from '../../expenses/repositories/expenses.repo';
 
 export class RenewalService {
   /**
@@ -44,16 +45,27 @@ export class RenewalService {
       subscription.billing_cycle
     );
 
+    // Update the renewal date
     await subscriptionsRepo.updateRenewalDate(
       subscription.subscription_id,
       nextRenewalDate
     );
 
+    // Create an expense entry for the renewal
+    const renewalExpense = await expensesRepo.create(subscription.user_id, {
+      title: `${subscription.subscription_title} (Subscription Renewal)`,
+      category: subscription.subscription_category,
+      amount_cents: subscription.subscription_amount_cents,
+      date: currentRenewalDate.toISOString().split('T')[0],
+      note: `Auto-renewed ${subscription.billing_cycle} subscription`,
+    });
+
     console.log(
       `Renewed subscription ${subscription.subscription_id} ` +
       `(${subscription.subscription_title}) from ` +
       `${currentRenewalDate.toISOString().split('T')[0]} to ` +
-      `${nextRenewalDate.toISOString().split('T')[0]}`
+      `${nextRenewalDate.toISOString().split('T')[0]}. ` +
+      `Created expense ${renewalExpense.expense_id}`
     );
   }
 

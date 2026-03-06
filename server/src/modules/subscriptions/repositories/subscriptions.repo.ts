@@ -2,6 +2,7 @@ import { pool } from "../../../db";
 
 export type SubscriptionRow = {
   subscription_id: string;
+  user_id: string;
   subscription_title: string;
   subscription_category: string;
   subscription_amount_cents: number;
@@ -37,6 +38,7 @@ export const subscriptionsRepo = {
     const result = await pool.query<SubscriptionRow>(
       `SELECT
         subscription_id,
+        user_id,
         subscription_title,
         subscription_category,
         subscription_amount_cents,
@@ -69,6 +71,7 @@ export const subscriptionsRepo = {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING
         subscription_id,
+        user_id,
         subscription_title,
         subscription_category,
         subscription_amount_cents,
@@ -108,6 +111,7 @@ export const subscriptionsRepo = {
       WHERE subscription_id = $8
       RETURNING
         subscription_id,
+        user_id,
         subscription_title,
         subscription_category,
         subscription_amount_cents,
