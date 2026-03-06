@@ -24,7 +24,7 @@
 }
 
 .logo {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: #0f9b72;
@@ -49,13 +49,13 @@
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  height: 36px;
-  padding: 0 0.875rem;
+  height: 40px;
+  padding: 0 1rem;
   border-radius: 8px;
   border: 1.5px solid #4ecca3;
   background: rgba(78, 204, 163, 0.08);
   color: #0f9b72;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -108,15 +108,15 @@
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0.75rem;
+  justify-content: center;
+  gap: 0.35rem;
   padding: 0 1rem;
   color: #4b5563;
   text-decoration: none;
   border-radius: 10px;
   transition: all 0.2s ease;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 1rem;
   letter-spacing: 0.01em;
   border: 1px solid transparent;
 }
@@ -173,15 +173,15 @@
 }
 
 .user-avatar {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
   background: linear-gradient(135deg, #4ecca3 0%, #3dbb92 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   color: #ffffff;
   flex-shrink: 0;
   overflow: hidden;
@@ -201,7 +201,7 @@
 }
 
 .username {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #1a1a2e;
   white-space: nowrap;
@@ -210,19 +210,19 @@
 }
 
 .user-label {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   color: #6b7280;
   font-weight: 400;
 }
 
 .logout-btn {
   margin-top: 0.5rem;
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1rem;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   color: #e0e0e0;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -349,4 +349,48 @@
 
 .btn-cancel:hover {
   background-color: #e5e7eb;
+}
+
+/* Responsive Scaling */
+@media (max-width: 640px) {
+  .header {
+    padding: 0.75rem 1rem;
+  }
+
+  .logo {
+    font-size: 1.1rem;
+  }
+
+  .header-icon-button {
+    font-size: 0.75rem;
+    padding: 0 0.625rem;
+    height: 32px;
+  }
+
+  .sidebar {
+    width: 180px;
+  }
+
+  .nav-item {
+    font-size: 0.85rem;
+    padding: 0 0.75rem;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .header {
+    padding: 0.875rem 1.5rem;
+  }
+
+  .sidebar {
+    width: 200px;
+  }
+
+  .main-content {
+    padding: 1.5rem;
+  }
 }

@@ -392,3 +392,53 @@
 .btn-danger:active {
   transform: translateY(0);
 }
+
+/* Responsive Scaling */
+@media (max-width: 640px) {
+  .subscriptions-page {
+    padding: 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .subscriptions-table th,
+  .subscriptions-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger {
+    width: 100%;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 95%;
+    padding: 1rem;
+  }
+
+  .modal-content form {
+    padding: 1rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .modal-footer button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .subscriptions-page {
+    padding: 1.5rem;
+  }
+}

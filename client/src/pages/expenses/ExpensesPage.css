@@ -691,17 +691,41 @@
   .instant-filters {
     flex-direction: column;
   }
-  
+
   .filter-row {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .filter-row-title {
     min-width: 0;
   }
-  
+
   .date-presets {
     flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .expenses-page {
+    padding: 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .expenses-table th,
+  .expenses-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    padding: 0.75rem 1rem;
   }
 }

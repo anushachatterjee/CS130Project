@@ -140,7 +140,6 @@ export default function MainLayout() {
                 <div className="user-label">My Account</div>
               </div>
             </div>
-            <div className="username">{username}</div>
             <button className="logout-btn" onClick={handleLogout}>
               Logout
             </button>
