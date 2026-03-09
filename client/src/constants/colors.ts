@@ -6,6 +6,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   'Transportation': '#45b7d1',
   'Utilities': '#ff9800',
   'Entertainment': '#a29bfe',
+  'Healthcare': '#2ecc71',
   'Other': '#95a5a6',
 };
 

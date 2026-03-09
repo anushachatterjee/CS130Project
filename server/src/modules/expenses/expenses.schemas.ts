@@ -6,6 +6,7 @@ export const ExpenseCategory = z.enum([
   "Transportation",
   "Utilities",
   "Entertainment",
+  "Healthcare",
   "Other",
 ]);
 
