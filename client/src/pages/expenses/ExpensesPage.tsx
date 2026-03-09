@@ -382,6 +382,7 @@ export default function ExpensesPage() {
                       <option value="Transportation">Transport</option>
                       <option value="Utilities">Utilities</option>
                       <option value="Entertainment">Entertainment</option>
+                      <option value="Healthcare">Healthcare</option>
                       <option value="Other">Other</option>
                     </select>
                   </div>
@@ -539,6 +540,7 @@ export default function ExpensesPage() {
                 <option value="Transportation">Transportation</option>
                 <option value="Utilities">Utilities</option>
                 <option value="Entertainment">Entertainment</option>
+                <option value="Healthcare">Healthcare</option>
                 <option value="Other">Other</option>
               </select>
             </div>

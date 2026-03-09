@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS expenses (
         NOT NULL,
     expense_category TEXT 
         NOT NULL 
-        CHECK (expense_category IN ('Food','Housing','Transportation','Utilities','Entertainment','Other')),
+        CHECK (expense_category IN ('Food','Housing','Transportation','Utilities','Entertainment','Healthcare','Other')),
     expense_amount_cents INT 
         NOT NULL
         CHECK (expense_amount_cents > 0),
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS budgets (
             ON DELETE CASCADE,
     budget_category TEXT 
         NOT NULL 
-        CHECK (budget_category IN ('Food','Housing','Transportation','Utilities','Entertainment','Other')),
+        CHECK (budget_category IN ('Food','Housing','Transportation','Utilities','Entertainment','Healthcare','Other')),
     monthly_limit_cents INT 
         NOT NULL
         CHECK (monthly_limit_cents >= 0),
