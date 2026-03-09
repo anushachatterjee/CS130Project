@@ -8,5 +8,8 @@ node_modules/
 # build
 dist/
 
+# test coverage
+coverage/
+
 # logs
 npm-debug.log*
