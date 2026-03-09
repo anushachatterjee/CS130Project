@@ -310,7 +310,8 @@ export default function ExpensesPage() {
 
   useEffect(() => {
     fetchExpenses(filters);
-  }, [filters, fetchExpenses]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const [showFilters, setShowFilters] = useState(false);
 
