@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
         NOT NULL,
     subscription_category TEXT
         NOT NULL
-        CHECK (subscription_category IN ('Food','Housing','Transportation','Utilities','Entertainment','Other')),
+        CHECK (subscription_category IN ('Food','Housing','Transportation','Utilities','Entertainment','Healthcare','Other')),
     subscription_amount_cents INT
         NOT NULL
         CHECK (subscription_amount_cents > 0),
