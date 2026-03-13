@@ -53,8 +53,8 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: fintrack_user
+          POSTGRES_PASSWORD: fintrack_pass
           POSTGRES_DB: fintrack_test
         ports:
           - 5432:5432
@@ -83,8 +83,6 @@ jobs:
         run: npm ci
 
       - name: Run backend tests
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/fintrack_test
         run: npm test
 
       - name: Build backend
