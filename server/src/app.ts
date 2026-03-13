@@ -8,6 +8,7 @@ import { subscriptionsRouter } from "./modules/subscriptions/subscriptions.route
 import { expensesRouter } from "./modules/expenses/expenses.routes";
 import { authRouter } from "./modules/auth/auth.routes";
 import { aiRouter } from "./modules/ai/ai.routes";
+import { budgetsRouter } from "./modules/budgets/budgets.routes";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/subscriptions", subscriptionsRouter);
 app.use("/api/expenses", expensesRouter);
 app.use("/api/ai", aiRouter);
+app.use("/api/budgets", budgetsRouter);
 
 // Global error handler — converts ZodErrors to 400, everything else to 500
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
