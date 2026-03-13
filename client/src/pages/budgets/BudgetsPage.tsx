@@ -246,12 +246,14 @@ export default function BudgetsPage() {
                       </span>
                     </td>
                     <td className="actions-cell">
-                      <button className="action-btn edit-btn" onClick={() => openEditModal(budget)} title="Edit">
-                        &#9998;
-                      </button>
-                      <button className="action-btn delete-btn" onClick={() => confirmDelete(budget)} title="Delete">
-                        &#128465;
-                      </button>
+                      <div className="action-buttons">
+                        <button className="btn-edit" onClick={() => openEditModal(budget)}>
+                          Edit
+                        </button>
+                        <button className="btn-delete" onClick={() => confirmDelete(budget)}>
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
