@@ -94,4 +94,83 @@ describe('Add Subscription modal', () => {
     );
   });
 
+  it('calls POST /subscriptions when Add Subscription form is submitted', async () => {
+    mockApiFetch
+      .mockResolvedValueOnce(makeOkResponse([]))   // initial fetch
+      .mockResolvedValueOnce(makeOkResponse({}))   // POST
+      .mockResolvedValueOnce(makeOkResponse([]));  // refresh fetch
+
+    render(<SubscriptionsPage />);
+    await waitFor(() => screen.getByRole('button', { name: /add subscription/i }), { timeout: 3000 });
+    fireEvent.click(screen.getByRole('button', { name: /add subscription/i }));
+
+    fireEvent.change(screen.getByLabelText(/^Name/i), { target: { value: 'Spotify' } });
+    fireEvent.change(screen.getByLabelText(/amount/i), { target: { value: '9.99' } });
+    fireEvent.change(screen.getByLabelText(/renewal/i), { target: { value: '2026-04-01' } });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add Subscription' }));
+
+    await waitFor(() =>
+      expect(mockApiFetch).toHaveBeenCalledWith(
+        '/subscriptions',
+        expect.objectContaining({ method: 'POST' })
+      )
+    );
+  });
+});
+
+// ─── Edit subscription ────────────────────────────────────────────────────────
+
+describe('Edit Subscription modal', () => {
+  it('opens modal pre-filled and calls PUT on submit', async () => {
+    mockApiFetch
+      .mockResolvedValueOnce(makeOkResponse([MOCK_SUBSCRIPTION]))  // initial fetch
+      .mockResolvedValueOnce(makeOkResponse({}))                    // PUT
+      .mockResolvedValueOnce(makeOkResponse([]));                   // refresh fetch
+
+    render(<SubscriptionsPage />);
+    await waitFor(() => screen.getByText('Netflix'), { timeout: 3000 });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    expect(screen.getByRole('heading', { name: 'Edit Subscription' })).toBeInTheDocument();
+
+    // Change status to canceled
+    fireEvent.change(screen.getByLabelText(/status/i), { target: { value: 'canceled' } });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Update Subscription' }));
+
+    await waitFor(() =>
+      expect(mockApiFetch).toHaveBeenCalledWith(
+        `/subscriptions/${MOCK_SUBSCRIPTION.subscription_id}`,
+        expect.objectContaining({ method: 'PUT' })
+      )
+    );
+  });
+});
+
+// ─── Delete subscription ──────────────────────────────────────────────────────
+
+describe('Delete Subscription', () => {
+  it('shows confirm dialog and calls DELETE on confirmation', async () => {
+    mockApiFetch
+      .mockResolvedValueOnce(makeOkResponse([MOCK_SUBSCRIPTION]))  // initial fetch
+      .mockResolvedValueOnce(makeOkResponse({}))                    // DELETE
+      .mockResolvedValueOnce(makeOkResponse([]));                   // refresh fetch
+
+    render(<SubscriptionsPage />);
+    await waitFor(() => screen.getByText('Netflix'), { timeout: 3000 });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    expect(screen.getByRole('heading', { name: 'Confirm Deletion' })).toBeInTheDocument();
+
+    // Table row Delete + confirm dialog Delete; click the confirm dialog one
+    fireEvent.click(screen.getAllByRole('button', { name: 'Delete' })[1]);
+
+    await waitFor(() =>
+      expect(mockApiFetch).toHaveBeenCalledWith(
+        `/subscriptions/${MOCK_SUBSCRIPTION.subscription_id}`,
+        expect.objectContaining({ method: 'DELETE' })
+      )
+    );
+  });
 });

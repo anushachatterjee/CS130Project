@@ -143,3 +143,40 @@ describe('Form submission', () => {
     );
   });
 });
+
+// ─── Registration ─────────────────────────────────────────────────────────────
+
+describe('Registration', () => {
+  it('registers a new account, saves token, and navigates on success', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ token: 'reg-token', user_id: '42' }),
+    } as Response);
+
+    render(<LoginPage />);
+    fireEvent.click(screen.getAllByRole('button', { name: 'Register' })[0]);
+    fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'newuser' } });
+    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'Password1!' } });
+    fireEvent.submit(screen.getByRole('button', { name: 'Create Account' }));
+
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard'));
+    expect(localStorage.getItem('token')).toBe('reg-token');
+  });
+
+  it('shows server error message when registration is rejected', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ error: 'Password must be at least 8 characters' }),
+    } as Response);
+
+    render(<LoginPage />);
+    fireEvent.click(screen.getAllByRole('button', { name: 'Register' })[0]);
+    fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'newuser' } });
+    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'short' } });
+    fireEvent.submit(screen.getByRole('button', { name: 'Create Account' }));
+
+    await waitFor(() =>
+      expect(screen.getByText('Password must be at least 8 characters')).toBeInTheDocument()
+    );
+  });
+});

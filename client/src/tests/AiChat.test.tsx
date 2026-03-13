@@ -93,6 +93,30 @@ describe('Sending messages', () => {
     await waitFor(() => screen.getByText(/could not reach the AI service/i));
     expect(screen.getByText(/could not reach the AI service/i)).toBeInTheDocument();
   });
+
+  it('includes prior conversation history in subsequent requests', async () => {
+    mockApiFetch
+      .mockResolvedValueOnce(makeOkResponse({ reply: 'First reply' }))
+      .mockResolvedValueOnce(makeOkResponse({ reply: 'Second reply' }));
+
+    render(<AiChat />);
+
+    sendMessage(screen.getByRole('textbox'), 'First question');
+    await waitFor(() => screen.getByText('First reply'));
+
+    sendMessage(screen.getByRole('textbox'), 'Second question');
+    await waitFor(() => screen.getByText('Second reply'));
+
+    const secondCallBody = JSON.parse(
+      (mockApiFetch.mock.calls[1] as [string, { body: string }])[1].body
+    );
+    expect(secondCallBody.history).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ role: 'user', content: 'First question' }),
+        expect.objectContaining({ role: 'assistant', content: 'First reply' }),
+      ])
+    );
+  });
 });
 
 describe('Analyze My Finances button', () => {
